@@ -1,0 +1,41 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/notflawffles/Projects/dune16/include",
+      "-c",
+      "-o",
+      "CMakeFiles/dune16.dir/src/main.c.o",
+      "/home/notflawffles/Projects/dune16/src/main.c"
+    ],
+    "directory": "/home/notflawffles/Projects/dune16/build",
+    "file": "/home/notflawffles/Projects/dune16/src/main.c",
+    "output": "/home/notflawffles/Projects/dune16/build/CMakeFiles/dune16.dir/src/main.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/notflawffles/Projects/dune16/include",
+      "-c",
+      "-o",
+      "CMakeFiles/dune16.dir/src/compiler/parser/generator.c.o",
+      "/home/notflawffles/Projects/dune16/src/compiler/parser/generator.c"
+    ],
+    "directory": "/home/notflawffles/Projects/dune16/build",
+    "file": "/home/notflawffles/Projects/dune16/src/compiler/parser/generator.c",
+    "output": "/home/notflawffles/Projects/dune16/build/CMakeFiles/dune16.dir/src/compiler/parser/generator.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/notflawffles/Projects/dune16/include",
+      "-c",
+      "-o",
+      "CMakeFiles/dune16.dir/src/compiler/parser/parser.c.o",
+      "/home/notflawffles/Projects/dune16/src/compiler/parser/parser.c"
+    ],
+    "directory": "/home/notflawffles/Projects/dune16/build",
+    "file": "/home/notflawffles/Projects/dune16/src/compiler/parser/parser.c",
+    "output": "/home/notflawffles/Projects/dune16/build/CMakeFiles/dune16.dir/src/compiler/parser/parser.c.o"
+  }
+]

@@ -1,0 +1,6 @@
+#ifndef DUNE16_MEMORY_H
+#define DUNE16_MEMORY_H
+
+#define MEMORY_SIZE 64 * 1024 - 1
+
+#endif // DUNE16_MEMORY_H
