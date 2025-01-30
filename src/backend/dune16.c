@@ -5,9 +5,6 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#include <dync/common/methods.h>
-#include <dync/common/define.h>
-
 #include "backend/dune16.h"
 #include "backend/common/define/flag_dune16.h"
 #include "backend/common/define/interrupt.h"
@@ -15,12 +12,48 @@
 #include "backend/instruction/callback.h"
 #include "backend/common/register.h"
 #include "backend/common/define/flag_instruction.h"
+#include "compiler/generator.h"
+
+DYNC_DYNMAP_IMPLEMENT(InstructionSize, instruction_size, u16, u8);
+
+bool dynmap_instruction_size_compare_key_current(u16 key, u16 current) {
+    return key == current;
+}
+
+char *dynarr_instruction_size_dynmap_key_element_format(u16 *const value) {
+    return dync_format("%d", *value);
+}
+
+char *dynarr_instruction_size_dynmap_value_element_format(u8 *const value) {
+    return dync_format("%d", *value);
+}
 
 struct dune16_t dune16_new(void) {
+    DynMapInstructionSize instruction_sizes = dynmap_instruction_size_new();
+
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_NOP, 2);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_MOV, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_STR, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_LOD, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_ADD, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_SUB, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_MUL, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_MOD, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_AND, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_IOR, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_XOR, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_NOT, 3);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_LSL, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_LSR, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_CMP, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_BCH, 4);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_SYS, 2);
+    dynmap_instruction_size_set(&instruction_sizes, OPCODE_HLT, 2);
+
     u16 *memory = calloc(MEMORY_SIZE, sizeof(u16));
     memset(memory, 0, MEMORY_SIZE);
 
-    return (struct dune16_t) { memory };
+    return (struct dune16_t) { instruction_sizes, memory };
 }
 
 static void dune16_update_interrupt(struct dune16_t *const this, const u8 interrupt, const bool condition) {
@@ -28,7 +61,7 @@ static void dune16_update_interrupt(struct dune16_t *const this, const u8 interr
 }
 
 u16 dune16_read_16(struct dune16_t *const this, const u16 address) {
-    dune16_update_interrupt(this, INTERRUPT_BUS_ERROR, address >= MEMORY_SIZE);
+    dune16_update_interrupt(this, INTERRUPT_BUS_ERROR, address > MEMORY_SIZE);
     return this->memory[address];
 }
 
@@ -71,6 +104,8 @@ static void dune16_decode(struct dune16_t *const this) {
 	{ .addresser = addresser_ab, 		.callback = callback_lsl },
 	{ .addresser = addresser_ab, 		.callback = callback_lsr },
 	{ .addresser = addresser_ab, 		.callback = callback_cmp },
+	{ .addresser = addresser_a, 		.callback = callback_bch },
+	{ .addresser = addresser_implied, 	.callback = callback_sys },
 	{ .addresser = addresser_implied, 	.callback = callback_hlt },
     };
 

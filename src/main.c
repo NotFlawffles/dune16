@@ -39,6 +39,6 @@ int main(const int argc, char *const argv[]) {
 	dune16_load_program_from_file(&dune16, argv[2]);
 	dune16_run(&dune16);
 	
-	return dune16.registers.a;
+	return dune16.registers.b;
     }
 }

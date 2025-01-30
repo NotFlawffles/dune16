@@ -18,6 +18,8 @@ void callback_not(struct dune16_t *const dune16);
 void callback_lsl(struct dune16_t *const dune16);
 void callback_lsr(struct dune16_t *const dune16);
 void callback_cmp(struct dune16_t *const dune16);
+void callback_bch(struct dune16_t *const dune16);
+void callback_sys(struct dune16_t *const dune16);
 void callback_hlt(struct dune16_t *const dune16);
 
 #endif // DUNE16_CALLBACK_H

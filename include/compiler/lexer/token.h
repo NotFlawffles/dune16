@@ -12,6 +12,7 @@ DYNC_OPTION_DECLARE(DynArrChar, dynarr_char, DynArrChar);
     X(TOKEN_TYPE_IDENTIFIER), \
     X(TOKEN_TYPE_DECIMAL), \
     X(TOKEN_TYPE_COMMA), \
+    X(TOKEN_TYPE_COLON), \
     X(TOKEN_TYPE_END_OF_FILE),
 
 #define X(variant) variant

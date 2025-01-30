@@ -26,6 +26,7 @@ DynArrSyntax parser_parse(struct parser_t *const this);
 struct syntax_t parser_parse_next(struct parser_t *const this);
 struct syntax_t parser_parse_name(struct parser_t *const this);
 struct syntax_t parser_parse_instruction(struct parser_t *const this);
+struct syntax_t parser_parse_label(struct parser_t *const this);
 
 struct token_t parser_eat(struct parser_t *const this, const enum token_type_t type);
 struct token_t parser_advance(struct parser_t *const this);

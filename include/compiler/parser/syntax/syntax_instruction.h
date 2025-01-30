@@ -1,5 +1,5 @@
-#ifndef DUNE16_INSTRUCTION_H
-#define DUNE16_INSTRUCTION_H
+#ifndef DUNE16_SYNTAX_INSTRUCTION_H
+#define DUNE16_SYNTAX_INSTRUCTION_H
 
 #include <dync/common/types.h>
 
@@ -24,7 +24,7 @@ struct source_argument_t {
     } value;
 };
 
-struct instruction_t {
+struct syntax_instruction_t {
     char *mnemonic, flag;
 
     struct {
@@ -35,4 +35,4 @@ struct instruction_t {
     } arguments;
 };
 
-#endif // DUNE16_INSTRUCTION_H
+#endif // DUNE16_SYNTAX_INSTRUCTION_H

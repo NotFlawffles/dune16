@@ -3,18 +3,23 @@
 
 #include <bits/pthreadtypes.h>
 
+#include <dync/dynmap.h>
 #include <dync/common/types.h>
 
 #include "memory.h"
 #include "instruction/instruction.h"
 
+DYNC_DYNMAP_DECLARE(InstructionSize, instruction_size, u16, u8);
+
 struct dune16_t {
+    DynMapInstructionSize instruction_sizes;
+
     u16 *memory;
     u8 flags;
     u8 interrupts;
 
     struct {
-	u16 a, b, c, d, pc;
+	u16 a, b, c, d, pc, lr;
     } registers;
 
     struct instruction_t instruction;

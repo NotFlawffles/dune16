@@ -7,6 +7,7 @@ enum {
     REGISTER_C,
     REGISTER_D,
     REGISTER_PC,
+    REGISTER_LR,
     REGISTER_COUNT,
 };
 

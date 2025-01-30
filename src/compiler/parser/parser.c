@@ -54,6 +54,8 @@ struct parser_t parser_new(const DynArrToken tokens) {
     dynarr_string_push(&mnemonics, "lsl");
     dynarr_string_push(&mnemonics, "lsr");
     dynarr_string_push(&mnemonics, "cmp");
+    dynarr_string_push(&mnemonics, "bch");
+    dynarr_string_push(&mnemonics, "sys");
     dynarr_string_push(&mnemonics, "hlt");
 
     DynMapInstructionArgumentCount instruction_argument_counts = dynmap_instruction_argument_count_new();
@@ -73,7 +75,9 @@ struct parser_t parser_new(const DynArrToken tokens) {
     dynmap_instruction_argument_count_set(&instruction_argument_counts, mnemonics.elements[12], 2);
     dynmap_instruction_argument_count_set(&instruction_argument_counts, mnemonics.elements[13], 2);
     dynmap_instruction_argument_count_set(&instruction_argument_counts, mnemonics.elements[14], 2);
-    dynmap_instruction_argument_count_set(&instruction_argument_counts, mnemonics.elements[15], 0);
+    dynmap_instruction_argument_count_set(&instruction_argument_counts, mnemonics.elements[15], 1);
+    dynmap_instruction_argument_count_set(&instruction_argument_counts, mnemonics.elements[16], 0);
+    dynmap_instruction_argument_count_set(&instruction_argument_counts, mnemonics.elements[17], 0);
 
     return (struct parser_t) { mnemonics, instruction_argument_counts, tokens, 0, *tokens.elements };
 }
@@ -103,14 +107,13 @@ struct syntax_t parser_parse_name(struct parser_t *const this) {
     if (dynarr_string_contains(&this->mnemonics, this->current.value.value.elements)) {
 	return parser_parse_instruction(this);
     } else {
-	dync_panic(dync_format("labels unimplemented: %s", this->current.value.value.elements));
-	return (struct syntax_t) {};
+	return parser_parse_label(this);
     }
 }
 
 struct syntax_t parser_parse_instruction(struct parser_t *const this) {
     const usize index = this->current.index;
-    struct instruction_t instruction = { this->current.value.value.elements, this->current.value.value.elements[3] };
+    struct syntax_instruction_t instruction = { this->current.value.value.elements, this->current.value.value.elements[3] };
     instruction.mnemonic[3] = '\0';
     const u8 argument_count = dynmap_instruction_argument_count_get(&this->instruction_argument_counts, instruction.mnemonic);
     instruction.arguments.has_source = argument_count == 2;
@@ -121,7 +124,7 @@ struct syntax_t parser_parse_instruction(struct parser_t *const this) {
 	    break;
 
 	case 1:
-	    instruction.arguments.a = parser_advance(this).value.value.elements;
+	    instruction.arguments.a = this->current.value.value.elements;
 	    parser_eat(this, TOKEN_TYPE_IDENTIFIER);
 	    break;
 
@@ -149,6 +152,15 @@ struct syntax_t parser_parse_instruction(struct parser_t *const this) {
     }
 
     return (struct syntax_t) { SYNTAX_TYPE_INSTRUCTION, index, .value.instruction = instruction };
+}
+
+struct syntax_t parser_parse_label(struct parser_t *const this) {
+    const usize index = this->current.index;
+    char *name = this->current.value.value.elements;
+    parser_advance(this);
+    parser_eat(this, TOKEN_TYPE_COLON);
+    
+    return (struct syntax_t) { SYNTAX_TYPE_LABEL, index, .value.label = name };
 }
 
 struct token_t parser_eat(struct parser_t *const this, const enum token_type_t type) {

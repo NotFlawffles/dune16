@@ -1,4 +1,4 @@
-#include "compiler/parser/syntax/instruction.h"
+#include "compiler/parser/syntax/syntax_instruction.h"
 
 #define X(variant) #variant
 

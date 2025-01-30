@@ -1,0 +1,10 @@
+#ifndef DUNE16_SYSCALL_H
+#define DUNE16_SYSCALL_H
+
+enum {
+    SYSCALL_RESET,
+    SYSCALL_EXIT,
+    SYSCALL_WRITE,
+};
+
+#endif // DUNE16_SYSCALL_H

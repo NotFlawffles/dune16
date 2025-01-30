@@ -5,12 +5,12 @@
       "-I/home/notflawffles/Projects/dune16/include",
       "-c",
       "-o",
-      "CMakeFiles/dune16.dir/src/main.c.o",
-      "/home/notflawffles/Projects/dune16/src/main.c"
+      "CMakeFiles/dune16.dir/src/compiler/parser/syntax/syntax.c.o",
+      "/home/notflawffles/Projects/dune16/src/compiler/parser/syntax/syntax.c"
     ],
     "directory": "/home/notflawffles/Projects/dune16/build",
-    "file": "/home/notflawffles/Projects/dune16/src/main.c",
-    "output": "/home/notflawffles/Projects/dune16/build/CMakeFiles/dune16.dir/src/main.c.o"
+    "file": "/home/notflawffles/Projects/dune16/src/compiler/parser/syntax/syntax.c",
+    "output": "/home/notflawffles/Projects/dune16/build/CMakeFiles/dune16.dir/src/compiler/parser/syntax/syntax.c.o"
   },
   {
     "arguments": [
@@ -31,11 +31,63 @@
       "-I/home/notflawffles/Projects/dune16/include",
       "-c",
       "-o",
+      "CMakeFiles/dune16.dir/src/backend/instruction/callback.c.o",
+      "/home/notflawffles/Projects/dune16/src/backend/instruction/callback.c"
+    ],
+    "directory": "/home/notflawffles/Projects/dune16/build",
+    "file": "/home/notflawffles/Projects/dune16/src/backend/instruction/callback.c",
+    "output": "/home/notflawffles/Projects/dune16/build/CMakeFiles/dune16.dir/src/backend/instruction/callback.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/notflawffles/Projects/dune16/include",
+      "-c",
+      "-o",
       "CMakeFiles/dune16.dir/src/compiler/parser/parser.c.o",
       "/home/notflawffles/Projects/dune16/src/compiler/parser/parser.c"
     ],
     "directory": "/home/notflawffles/Projects/dune16/build",
     "file": "/home/notflawffles/Projects/dune16/src/compiler/parser/parser.c",
     "output": "/home/notflawffles/Projects/dune16/build/CMakeFiles/dune16.dir/src/compiler/parser/parser.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/notflawffles/Projects/dune16/include",
+      "-c",
+      "-o",
+      "CMakeFiles/dune16.dir/src/backend/instruction/addresser.c.o",
+      "/home/notflawffles/Projects/dune16/src/backend/instruction/addresser.c"
+    ],
+    "directory": "/home/notflawffles/Projects/dune16/build",
+    "file": "/home/notflawffles/Projects/dune16/src/backend/instruction/addresser.c",
+    "output": "/home/notflawffles/Projects/dune16/build/CMakeFiles/dune16.dir/src/backend/instruction/addresser.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/notflawffles/Projects/dune16/include",
+      "-c",
+      "-o",
+      "CMakeFiles/dune16.dir/src/main.c.o",
+      "/home/notflawffles/Projects/dune16/src/main.c"
+    ],
+    "directory": "/home/notflawffles/Projects/dune16/build",
+    "file": "/home/notflawffles/Projects/dune16/src/main.c",
+    "output": "/home/notflawffles/Projects/dune16/build/CMakeFiles/dune16.dir/src/main.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/notflawffles/Projects/dune16/include",
+      "-c",
+      "-o",
+      "CMakeFiles/dune16.dir/src/backend/dune16.c.o",
+      "/home/notflawffles/Projects/dune16/src/backend/dune16.c"
+    ],
+    "directory": "/home/notflawffles/Projects/dune16/build",
+    "file": "/home/notflawffles/Projects/dune16/src/backend/dune16.c",
+    "output": "/home/notflawffles/Projects/dune16/build/CMakeFiles/dune16.dir/src/backend/dune16.c.o"
   }
 ]
