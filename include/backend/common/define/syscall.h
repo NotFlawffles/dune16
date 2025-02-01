@@ -5,6 +5,7 @@ enum {
     SYSCALL_RESET,
     SYSCALL_EXIT,
     SYSCALL_WRITE,
+    SYSCALL_READ,
 };
 
 #endif // DUNE16_SYSCALL_H

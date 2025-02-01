@@ -19,7 +19,7 @@ struct dune16_t {
     u8 interrupts;
 
     struct {
-	u16 a, b, c, d, pc, lr;
+	u16 a, b, c, d, pc, lr, sp;
     } registers;
 
     struct instruction_t instruction;

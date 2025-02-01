@@ -28,11 +28,26 @@ DynArrToken lexer_tokenize(struct lexer_t *const this) {
 
 struct token_t lexer_tokenize_next(struct lexer_t *const this) {
     switch (lexer_skip_whitespace(this)) {
+	case '\'':
+	    return lexer_tokenize_character(this);
+
+	case '\"':
+	    return lexer_tokenize_string(this);
+
 	case ',':
 	    return lexer_advance_with_token(this, (struct token_t) { TOKEN_TYPE_COMMA, this->index, option_dynarr_char_none() });
 
 	case ':':
 	    return lexer_advance_with_token(this, (struct token_t) { TOKEN_TYPE_COLON, this->index, option_dynarr_char_none() });
+
+	case '@':
+	    return lexer_advance_with_token(this, (struct token_t) { TOKEN_TYPE_AMPERSAT, this->index, option_dynarr_char_none() });
+
+	case '(':
+	    return lexer_advance_with_token(this, (struct token_t) { TOKEN_TYPE_LEFT_PARENTHESIS, this->index, option_dynarr_char_none() });
+
+	case ')':
+	    return lexer_advance_with_token(this, (struct token_t) { TOKEN_TYPE_RIGHT_PARENTHESIS, this->index, option_dynarr_char_none() });
 
 	case '\0':
 	    return (struct token_t) { TOKEN_TYPE_END_OF_FILE, this->index, option_dynarr_char_none() };
@@ -74,6 +89,41 @@ struct token_t lexer_tokenize_decimal(struct lexer_t *const this) {
     value.elements[value.size] = '\0';
 
     return (struct token_t) { TOKEN_TYPE_DECIMAL, index, option_dynarr_char_some(value) };
+}
+
+struct token_t lexer_tokenize_character(struct lexer_t *const this) {
+    const usize index = this->index;
+    DynArrChar value = dynarr_char_new();
+
+    dynarr_char_push(&value, lexer_advance(this));
+    
+    if (*value.elements == '\'') {
+	dync_panic(dync_format("Invalid character literal value: `%c\'", value));
+    }
+
+    lexer_advance(this);
+
+    if (this->current != '\'') {
+	dync_panic(dync_format("Unterminated character literal at: %ld", index));
+    }
+
+    return lexer_advance_with_token(this, (struct token_t) { TOKEN_TYPE_CHARACTER, index, option_dynarr_char_some(value) });
+}
+
+struct token_t lexer_tokenize_string(struct lexer_t *const this) {
+    const usize index = this->index;
+    DynArrChar value = dynarr_char_new();
+
+    lexer_advance(this);
+
+    while (this->current != '\"') {
+	dynarr_char_push(&value, this->current);
+	lexer_advance(this);
+    }
+
+    value.elements[value.size] = '\0';
+
+    return lexer_advance_with_token(this, (struct token_t) { TOKEN_TYPE_STRING, index, option_dynarr_char_some(value) });
 }
 
 struct token_t lexer_advance_with_token(struct lexer_t *const this, const struct token_t token) {

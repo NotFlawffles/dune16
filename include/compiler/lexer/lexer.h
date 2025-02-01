@@ -20,6 +20,8 @@ DynArrToken lexer_tokenize(struct lexer_t *const this);
 struct token_t lexer_tokenize_next(struct lexer_t *const this);
 struct token_t lexer_tokenize_identifier(struct lexer_t *const this);
 struct token_t lexer_tokenize_decimal(struct lexer_t *const this);
+struct token_t lexer_tokenize_character(struct lexer_t *const this);
+struct token_t lexer_tokenize_string(struct lexer_t *const this);
 struct token_t lexer_advance_with_token(struct lexer_t *const this, const struct token_t token);
 
 char lexer_skip_whitespace(struct lexer_t *const this);

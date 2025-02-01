@@ -48,12 +48,15 @@ struct dune16_t dune16_new(void) {
     dynmap_instruction_size_set(&instruction_sizes, OPCODE_CMP, 4);
     dynmap_instruction_size_set(&instruction_sizes, OPCODE_BCH, 4);
     dynmap_instruction_size_set(&instruction_sizes, OPCODE_SYS, 2);
-    dynmap_instruction_size_set(&instruction_sizes, OPCODE_HLT, 2);
 
     u16 *memory = calloc(MEMORY_SIZE, sizeof(u16));
     memset(memory, 0, MEMORY_SIZE);
 
-    return (struct dune16_t) { instruction_sizes, memory };
+    return (struct dune16_t) {
+	instruction_sizes,
+	memory,
+	.registers.sp = MEMORY_SIZE,
+    };
 }
 
 static void dune16_update_interrupt(struct dune16_t *const this, const u8 interrupt, const bool condition) {
@@ -106,7 +109,6 @@ static void dune16_decode(struct dune16_t *const this) {
 	{ .addresser = addresser_ab, 		.callback = callback_cmp },
 	{ .addresser = addresser_a, 		.callback = callback_bch },
 	{ .addresser = addresser_implied, 	.callback = callback_sys },
-	{ .addresser = addresser_implied, 	.callback = callback_hlt },
     };
 
     assert(sizeof(INSTRUCTION_LOOKUP_TABLE) / sizeof(*INSTRUCTION_LOOKUP_TABLE) != OPCODE_COUNT - 1);

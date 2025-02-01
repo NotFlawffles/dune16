@@ -11,16 +11,6 @@ static u16 callback_get_source(struct dune16_t *const dune16) {
     return dune16->instruction.flags & FLAG_INSTRUCTION_IMMEDIATE ? dune16->instruction.arguments.b : *dune16_get_register(dune16, dune16->instruction.arguments.b);
 }
 
-static char *callback_chunk_to_string(const u16 *const destination, const u16 size) {
-    char *result = calloc(size, sizeof(char));
-
-    for (u16 index = 0; index < size; ++index) {
-	result[index] = destination[index];
-    }
-
-    return result;
-}
-
 void callback_nop(struct dune16_t *const dune16) {}
 
 void callback_mov(struct dune16_t *const dune16) {
@@ -110,16 +100,20 @@ void callback_sys(struct dune16_t *const dune16) {
 
 	case SYSCALL_WRITE: {
 	    const u16 file_descriptor = dune16->registers.b;
+	    const u8 *destination = (u8 *) &dune16->memory[dune16->registers.c];
 	    const u16 size = dune16->registers.d;
-	    char *destination_chunk_as_string = callback_chunk_to_string(&dune16->memory[dune16->registers.c], size);
 
-	    write(file_descriptor, destination_chunk_as_string, size);
-	    free(destination_chunk_as_string);
+	    write(file_descriptor, destination, size);
+	    break;
+	}
+
+	case SYSCALL_READ: {
+	    const u16 file_descriptor = dune16->registers.b;
+	    u8 *destination = (u8 *) &dune16->memory[dune16->registers.c];
+	    const u16 size = dune16->registers.d;
+
+	    read(file_descriptor, destination, size);
 	    break;
 	}
     }
-}
-
-void callback_hlt(struct dune16_t *const dune16) {
-    dune16->flags ^= FLAG_DUNE16_RUNNING;
 }

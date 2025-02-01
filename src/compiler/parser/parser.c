@@ -4,7 +4,6 @@
 #include "compiler/parser/parser.h"
 
 DYNC_DYNARR_IMPLEMENT(Syntax, syntax, struct syntax_t);
-DYNC_DYNARR_IMPLEMENT(String, string, const char *);
 
 DYNC_DYNMAP_IMPLEMENT(InstructionArgumentCount, instruction_argument_count, const char *, u8);
 
@@ -13,15 +12,7 @@ bool dynarr_syntax_compare_value_current(struct syntax_t value, struct syntax_t 
 }
 
 char *dynarr_syntax_element_format(struct syntax_t *const value) {
-    return dync_format("(struct syntax_t) { .type = SYNTAX_TYPE_INSTRUCTION, .index = %ld, .value = ... }", value->index);
-}
-
-bool dynarr_string_compare_value_current(const char *value, const char *current) {
-    return memcmp(value, current, 3) == 0;
-}
-
-char *dynarr_string_element_format(const char **const value) {
-    return dync_format("\"%s\"", *value);
+    return dync_format("(struct syntax_t) { .type = %s, .index = %ld, .value = ... }", syntax_type_format(value->type), value->index);
 }
 
 bool dynmap_instruction_argument_count_compare_key_current(const char *lhs, const char *rhs) {
@@ -56,7 +47,6 @@ struct parser_t parser_new(const DynArrToken tokens) {
     dynarr_string_push(&mnemonics, "cmp");
     dynarr_string_push(&mnemonics, "bch");
     dynarr_string_push(&mnemonics, "sys");
-    dynarr_string_push(&mnemonics, "hlt");
 
     DynMapInstructionArgumentCount instruction_argument_counts = dynmap_instruction_argument_count_new();
 
@@ -77,7 +67,6 @@ struct parser_t parser_new(const DynArrToken tokens) {
     dynmap_instruction_argument_count_set(&instruction_argument_counts, mnemonics.elements[14], 2);
     dynmap_instruction_argument_count_set(&instruction_argument_counts, mnemonics.elements[15], 1);
     dynmap_instruction_argument_count_set(&instruction_argument_counts, mnemonics.elements[16], 0);
-    dynmap_instruction_argument_count_set(&instruction_argument_counts, mnemonics.elements[17], 0);
 
     return (struct parser_t) { mnemonics, instruction_argument_counts, tokens, 0, *tokens.elements };
 }
@@ -97,6 +86,9 @@ struct syntax_t parser_parse_next(struct parser_t *const this) {
 	case TOKEN_TYPE_IDENTIFIER:
 	    return parser_parse_name(this);
 
+	case TOKEN_TYPE_AMPERSAT:
+	    return parser_parse_preprocessor(this);
+
 	default:
 	    dync_panic(dync_format("expected statement"));
 	    return (struct syntax_t) {};
@@ -104,7 +96,7 @@ struct syntax_t parser_parse_next(struct parser_t *const this) {
 }
 
 struct syntax_t parser_parse_name(struct parser_t *const this) {
-    if (dynarr_string_contains(&this->mnemonics, this->current.value.value.elements)) {
+    if (dynarr_string_contains(&this->mnemonics, this->current.value.value.elements) && this->tokens.elements[this->index + 1].type != TOKEN_TYPE_COLON) {
 	return parser_parse_instruction(this);
     } else {
 	return parser_parse_label(this);
@@ -132,22 +124,7 @@ struct syntax_t parser_parse_instruction(struct parser_t *const this) {
 	    instruction.arguments.a = this->current.value.value.elements;
 	    parser_eat(this, TOKEN_TYPE_IDENTIFIER); 
 	    parser_eat(this, TOKEN_TYPE_COMMA);
-
-	    switch (this->current.type) {
-		case TOKEN_TYPE_IDENTIFIER:
-		    instruction.arguments.b = (struct source_argument_t) { SOURCE_ARGUMENT_TYPE_NAME, .value.name = this->current.value.value.elements };
-		    break;
-
-		case TOKEN_TYPE_DECIMAL:
-		    instruction.arguments.b = (struct source_argument_t) { SOURCE_ARGUMENT_TYPE_INTEGER, .value.integer = strtol(this->current.value.value.elements, NULL, 10) };
-		    break;
-
-		default:
-		    dync_panic(dync_format("expected identifier or decimal in source argument for %s", instruction.mnemonic));
-		    break;
-	    }
-
-	    parser_advance(this);
+	    instruction.arguments.b = parser_parse_literal(this);
 	    break;
     }
 
@@ -161,6 +138,76 @@ struct syntax_t parser_parse_label(struct parser_t *const this) {
     parser_eat(this, TOKEN_TYPE_COLON);
     
     return (struct syntax_t) { SYNTAX_TYPE_LABEL, index, .value.label = name };
+}
+
+struct syntax_t parser_parse_preprocessor(struct parser_t *const this) {
+    const usize index = this->current.index;
+    const enum syntax_preprocessor_type_t type = syntax_preprocessor_type_from_string(parser_advance(this).value.value.elements);
+    parser_eat(this, TOKEN_TYPE_IDENTIFIER);
+
+    /* TODO: parse other types of preprocessors; other than only (@raw and @res) */
+
+    parser_eat(this, TOKEN_TYPE_LEFT_PARENTHESIS);
+    DynArrString arguments = dynarr_string_new();
+
+    while (this->current.type != TOKEN_TYPE_RIGHT_PARENTHESIS) {
+	dynarr_string_push(&arguments, this->current.value.value.elements);
+	parser_eat(this, TOKEN_TYPE_IDENTIFIER);
+
+	if (this->current.type != TOKEN_TYPE_RIGHT_PARENTHESIS) {
+	    parser_eat(this, TOKEN_TYPE_COMMA);
+	}
+    }
+
+    parser_eat(this, TOKEN_TYPE_RIGHT_PARENTHESIS);
+
+    DynArrLiteral literals = dynarr_literal_new();
+    
+    while (true) {
+	const struct literal_t current = parser_parse_literal(this);
+
+	dynarr_literal_push(&literals, current);
+
+	if (this->current.type != TOKEN_TYPE_COMMA) {
+	    break;
+	}
+
+	parser_advance(this);
+    }
+
+    return (struct syntax_t) {
+	SYNTAX_TYPE_PREPROCESSOR,
+	index,
+	
+	.value.preprocessor = {
+	    type,
+	    arguments,
+	    .context_arguments.literals = literals,
+	}
+    };
+}
+
+struct literal_t parser_parse_literal(struct parser_t *const this) {
+    struct token_t target = this->current;
+    parser_advance(this);
+
+    switch (target.type) {
+	case TOKEN_TYPE_IDENTIFIER:
+	    return (struct literal_t) { LITERAL_TYPE_NAME, .value.name = target.value.value.elements };
+
+	case TOKEN_TYPE_DECIMAL:
+	    return (struct literal_t) { LITERAL_TYPE_INTEGER, .value.integer = strtol(target.value.value.elements, NULL, 10) };
+
+	case TOKEN_TYPE_CHARACTER:
+	    return (struct literal_t) { LITERAL_TYPE_CHARACTER, .value.character = *target.value.value.elements };
+
+	case TOKEN_TYPE_STRING:
+	    return (struct literal_t) { LITERAL_TYPE_STRING, .value.string = target.value.value.elements };
+
+	default:
+	    dync_panic(dync_format("unexpected literal: %s", dynarr_token_element_format(&target)));
+	    return (struct literal_t) {};
+    }
 }
 
 struct token_t parser_eat(struct parser_t *const this, const enum token_type_t type) {

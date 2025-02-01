@@ -21,7 +21,6 @@ enum opcode_t {
     OPCODE_CMP,
     OPCODE_BCH,
     OPCODE_SYS,
-    OPCODE_HLT,
     OPCODE_COUNT,
 };
 

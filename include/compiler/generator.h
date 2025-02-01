@@ -23,5 +23,6 @@ void generator_generate(struct generator_t *const this);
 DynArrGenerationChunk generator_generate_next(struct generator_t *const this, struct syntax_t *const syntax);
 DynArrGenerationChunk generator_generate_instruction(struct generator_t *const this, struct syntax_t *const syntax);
 DynArrGenerationChunk generator_generate_label(struct generator_t *const this, struct syntax_t *const syntax);
+DynArrGenerationChunk generator_generate_preprocessor(struct generator_t *const this, struct syntax_t *const syntax);
 
 #endif // DUNE16_GENERATOR_H
